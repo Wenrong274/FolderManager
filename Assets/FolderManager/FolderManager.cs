@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Manager
 {
-    public class FolderManager
+    public class FolderManager : MonoBehaviour
     {
         [SerializeField] private static string rootName = "downloads";
         [SerializeField] private static string configName = "config";
