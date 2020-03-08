@@ -3,98 +3,120 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
-
-public class FolderWindow : EditorWindow
+namespace FolderManager
 {
-
-    public enum RootPath
+    public class FolderWindow : EditorWindow
     {
-        ProjectPath,
-        ProjectDataPath,
-        PersistentDataPath,
-        StreamingAssetsPath,
-        TemporaryCachePath
-    }
 
-    private int rootPathIndxed;
-    private string folderPath;
-    private string folderNode;
-    private List<string> nodeList = new List<string>();
+        private int rootPathIndxed;
+        private string folderPath;
+        private string folderNode;
+        private List<string> nodeList = new List<string>();
 
-    [MenuItem("Folder Manage/AA")]
-    static void Init()
-    {
-        FolderWindow window = (FolderWindow)EditorWindow.GetWindow(typeof(FolderWindow));
-        window.Show();
-    }
-
-    void OnGUI()
-    {
-        GUIStyle TitleStyle = new GUIStyle(GUI.skin.label) { fixedWidth = 140, alignment = TextAnchor.MiddleLeft };
-
-        var options = Enum.GetNames(typeof(RootPath));
-        rootPathIndxed = EditorGUILayout.Popup("Root Path", rootPathIndxed, options);
-        folderPath = GetFolderPath((RootPath)rootPathIndxed);
-
-        GUILayout.BeginHorizontal();
-        GUILayout.Label("Add Nodes", TitleStyle);
-        folderNode = GUILayout.TextField(folderNode);
-        if (GUILayout.Button("+", new GUIStyle(GUI.skin.button) { fixedWidth = 40, alignment = TextAnchor.MiddleCenter }))
+        [MenuItem("Folder Manage/Edit Path")]
+        static void Init()
         {
-            if (!string.IsNullOrEmpty(folderNode))
-            {
-                nodeList.Add(folderNode);
-                Debug.Log("+");
-            }
+            FolderWindow window = (FolderWindow)EditorWindow.GetWindow(typeof(FolderWindow));
+            window.Show();
         }
-        GUILayout.EndHorizontal();
 
-        if (nodeList.Count != 0)
+        void OnGUI()
         {
-            GUILayout.Label(folderPath, TitleStyle);
-            string hyphen = string.Empty;
-            for (int i = 1; i < nodeList.Count; i++)
+            GUIStyle TitleStyle = new GUIStyle(GUI.skin.label) { fixedWidth = 140, alignment = TextAnchor.MiddleLeft };
+            GUIStyle BtnStyle = new GUIStyle(GUI.skin.button) { fixedWidth = 40, alignment = TextAnchor.MiddleCenter };
+            string[] options = Enum.GetNames(typeof(RootPathType));
+            string[] Paths;
+
+            rootPathIndxed = EditorGUILayout.Popup("Root Path", rootPathIndxed, options);
+            folderPath = RootPath.GetFolderPath((RootPathType)rootPathIndxed);
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Add Nodes", TitleStyle);
+            folderNode = GUILayout.TextField(folderNode);
+            if (GUILayout.Button("+", BtnStyle))
             {
-                GUILayout.BeginHorizontal();
-                GUILayout.Label(hyphen + "└" + nodeList[i]);
-                if (GUILayout.Button("-", new GUIStyle(GUI.skin.button) { fixedWidth = 40, alignment = TextAnchor.MiddleCenter }))
+                if (!string.IsNullOrEmpty(folderNode))
                 {
-                    nodeList.RemoveAt(i);
+                    nodeList.Add(folderNode);
+                    folderNode = GUILayout.TextField(string.Empty);
+                    Debug.Log("+");
                 }
-                GUILayout.EndHorizontal();
-                hyphen += " ";
+            }
+            GUILayout.EndHorizontal();
+
+            if (nodeList.Count != 0)
+            {
+                GUILayout.Label(folderPath, TitleStyle);
+                string hyphen = string.Empty;
+                for (int i = 0; i < nodeList.Count; i++)
+                {
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Label(hyphen + "└" + nodeList[i]);
+                    if (GUILayout.Button("-", BtnStyle))
+                    {
+                        nodeList.RemoveAt(i);
+                    }
+                    GUILayout.EndHorizontal();
+                    hyphen += " ";
+                }
+
             }
 
+            GUILayout.BeginHorizontal();
+            Paths = new string[nodeList.Count + 1];
+            Paths[0] = folderPath;
+            for (int i = 1; i < Paths.Length; i++)
+                Paths[i] = nodeList[i - 1];
+            string path = Path.Combine(Paths).Replace('\\', '/');
+            GUILayout.Label("Folder Path", TitleStyle);
+            GUILayout.Label(path);
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Clean All Node"))
+            {
+                nodeList = new List<string>();
+                Debug.Log("Clean");
+            }
+            if (GUILayout.Button("Saving"))
+            {
+                Folder asset = new Folder()
+                {
+                    RootPathType = (RootPathType)rootPathIndxed,
+                    Node = nodeList.ToArray()
+                };
+                string savePath = "/FolderManager/" + typeof(Folder).ToString() + ".asset";
+                CreateAsset(asset, savePath);
+            }
+            GUILayout.EndHorizontal();
         }
-        GUILayout.BeginHorizontal();
 
-        GUILayout.Label("Folder Path", TitleStyle);
-        GUILayout.Label(folderPath, TitleStyle);
-        GUILayout.EndHorizontal();
-
-        if (GUILayout.Button("Clean All Node"))
+        private void CreateAsset<T>(T asset, string Savepath)where T : ScriptableObject
         {
-            nodeList = new List<string>();
-            Debug.Log("Clean");
-        }
-    }
+            string path = AssetDatabase.GetAssetPath(Selection.activeObject);
+            string assetPathAndName;
 
-    private string GetFolderPath(RootPath arg)
-    {
-        switch (arg)
-        {
-            case RootPath.ProjectPath:
-                return Directory.GetParent(Application.dataPath).FullName.Replace('\\', '/');
-            case RootPath.ProjectDataPath:
-                return Application.dataPath.Replace('\\', '/');
-            case RootPath.PersistentDataPath:
-                return Application.persistentDataPath.Replace('\\', '/');
-            case RootPath.StreamingAssetsPath:
-                return Application.streamingAssetsPath.Replace('\\', '/');
-            case RootPath.TemporaryCachePath:
-                return Application.temporaryCachePath.Replace('\\', '/');
-            default:
-                return string.Empty;
+            if (path == "")
+            {
+                path = "Assets";
+            }
+            else if (Path.GetExtension(path) != "")
+            {
+                path = path.Replace(Path.GetFileName(AssetDatabase.GetAssetPath(Selection.activeObject)), "");
+            }
+
+            assetPathAndName = AssetDatabase.GenerateUniqueAssetPath(path + Savepath);
+          
+            if (AssetDatabase.DeleteAsset(assetPathAndName))
+            {
+                AssetDatabase.CreateAsset(asset, assetPathAndName);
+            }
+
+
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            EditorUtility.FocusProjectWindow();
+            Selection.activeObject = asset;
         }
     }
 }
