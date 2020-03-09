@@ -15,5 +15,5 @@ MonoBehaviour:
   RootPathType: 0
   rootPath: D:/Unity/FolderManager
   Node:
-  - 123
-  - 12333
+  - node1
+  - node2
