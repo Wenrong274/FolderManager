@@ -11,6 +11,7 @@ namespace FolderManager
         StreamingAssetsPath,
         TemporaryCachePath
     }
+
     public class RootPath
     {
         public static string GetFolderPath(RootPathType arg)

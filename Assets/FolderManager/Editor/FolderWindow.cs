@@ -7,133 +7,57 @@ namespace FolderManager
 {
     public class FolderWindow : EditorWindow
     {
+        private List<Editor> editors;
         private RootPathType rootPathType;
-        private string folderPath;
-        private string folderNode;
-        private string AssetName = typeof(Folder).ToString() + ".asset";
-        private List<string> nodeList = new List<string>();
+        private string AssetName = typeof(FolderPath).ToString() + ".asset";
 
         [MenuItem("Folder Manage/Edit Path")]
         static void Init()
         {
             FolderWindow window = (FolderWindow)EditorWindow.GetWindow(typeof(FolderWindow));
+            window.editors = new List<Editor>();
             window.Show();
-            window.AseetInit();
-
-        }
-
-        public void AseetInit()
-        {
-            Folder asset = LoadAsset<Folder>(AssetName);
-            if (asset != null)
-            {
-                rootPathType = asset.RootPathType;
-                nodeList.AddRange(asset.Node);
-            }
         }
 
         void OnGUI()
         {
-            GUIStyle TitleStyle = new GUIStyle(GUI.skin.label) { fixedWidth = 140, alignment = TextAnchor.MiddleLeft };
-            GUIStyle BtnStyle = new GUIStyle(GUI.skin.button) { fixedWidth = 40, alignment = TextAnchor.MiddleCenter };
-
-            RootPathTypeGUI(TitleStyle);
-
-            AddNodesGUI(TitleStyle, BtnStyle);
-
-            ShowNodesGUI(TitleStyle, BtnStyle);
-
-            ShowPathGUI(TitleStyle);
-
-            CleanOrSaveGUI();
-        }
-
-        private void RootPathTypeGUI(GUIStyle TitleStyle)
-        {
-            GUIStyle popupGUI = new GUIStyle(GUI.skin.button) { alignment = TextAnchor.MiddleLeft };
-            string[] options = Enum.GetNames(typeof(RootPathType));
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Path", TitleStyle);
-            rootPathType = (RootPathType)EditorGUILayout.Popup((int)rootPathType, options, popupGUI);
-            folderPath = RootPath.GetFolderPath(rootPathType);
-            GUILayout.EndHorizontal();
-        }
-        private void AddNodesGUI(GUIStyle TitleStyle, GUIStyle BtnStyle)
-        {
-            GUIStyle textFieldGUI = new GUIStyle(GUI.skin.textField) { alignment = TextAnchor.LowerLeft };
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Add Nodes", TitleStyle);
-            folderNode = GUILayout.TextField(folderNode, textFieldGUI);
-            if (GUILayout.Button("+", BtnStyle))
+            if (GUILayout.Button("Add Folder Path"))
             {
-                if (!string.IsNullOrEmpty(folderNode))
-                {
-                    nodeList.Add(folderNode);
-                    folderNode = GUILayout.TextField(string.Empty);
-                    Debug.Log("+");
-                }
+                var editor = Editor.CreateEditor(ScriptableObject.CreateInstance<FolderPath>());
+                editors.Add(editor);
             }
             GUILayout.EndHorizontal();
-        }
-
-        private void ShowNodesGUI(GUIStyle TitleStyle, GUIStyle BtnStyle)
-        {
-            if (nodeList.Count != 0)
+            foreach (var e in editors)
             {
-                GUILayout.BeginHorizontal();
+                GUILayout.BeginVertical();
+                e.OnInspectorGUI();
+                GUILayout.EndVertical();
+                DrawUILine(Color.grey);
 
-                GUILayout.Label("Folder structure", TitleStyle);
-                GUILayout.Label(folderPath, TitleStyle);
-
-                GUILayout.EndHorizontal();
-
-                string hyphen = string.Empty;
-                for (int i = 0; i < nodeList.Count; i++)
-                {
-                    GUILayout.BeginHorizontal();
-                    GUILayout.Label(hyphen + "└");
-                    nodeList[i] = GUILayout.TextField(nodeList[i]);
-                    if (GUILayout.Button("-", BtnStyle))
-                    {
-
-                        nodeList.RemoveAt(i);
-                    }
-                    GUILayout.EndHorizontal();
-                    hyphen += " ";
-                }
             }
+
         }
 
-        private void ShowPathGUI(GUIStyle TitleStyle)
+        public static void DrawUILine(Color color, int thickness = 2, int padding = 10)
         {
-            string[] Paths;
-            GUILayout.BeginHorizontal();
-            Paths = new string[nodeList.Count + 1];
-            Paths[0] = folderPath;
-            for (int i = 1; i < Paths.Length; i++)
-                Paths[i] = nodeList[i - 1];
-            string path = Path.Combine(Paths).Replace('\\', '/');
-            GUILayout.Label("Folder Path", TitleStyle);
-            GUILayout.Label(path);
-            GUILayout.EndHorizontal();
+            Rect r = EditorGUILayout.GetControlRect(GUILayout.Height(padding + thickness));
+            r.height = thickness;
+            r.y += padding / 2;
+            r.x -= 2;
+            r.width += 6;
+            EditorGUI.DrawRect(r, color);
         }
 
         private void CleanOrSaveGUI()
         {
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Clean All Node"))
-            {
-                nodeList = new List<string>();
-                folderNode = string.Empty;
-                Debug.Log("Clean");
-            }
 
             if (GUILayout.Button("Saving"))
             {
-                Folder asset = new Folder()
+                FolderPath asset = new FolderPath()
                 {
                     RootPathType = (RootPathType)rootPathType,
-                    Node = nodeList.ToArray()
+                    //Node = nodeList
                 };
                 CreateAsset(asset, AssetName);
             }
