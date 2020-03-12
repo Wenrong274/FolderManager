@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fa966cabe2c0c8a45a048fe2bbece422, type: 3}
-  m_Name: LabelPath3
+  m_Name: Path_83f68576-6663-4f48-a6ef-09224b3526a3
   m_EditorClassIdentifier: 
-  Label: LabelPath3
+  Label: LabelPath_3
   RootPathType: 0
   RootPath: D:/Unity/FolderManager
   Node: []

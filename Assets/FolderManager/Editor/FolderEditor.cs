@@ -78,7 +78,6 @@ namespace FolderManager
         private void ShowNodesGUI(GUIStyle TitleStyle, GUIStyle BtnStyle, GUIStyle TextFieldGUI)
         {
             TitleStyle.alignment = TextAnchor.MiddleRight;
-
             for (int i = 0; i < m_Target.Node.Count; i++)
             {
                 string hyphen = (i < m_Target.Node.Count - 1) ? "┝ " : "└ ";

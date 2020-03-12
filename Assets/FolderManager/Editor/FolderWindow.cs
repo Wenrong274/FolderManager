@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -24,10 +25,13 @@ namespace FolderManager
         void OnGUI()
         {
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Add Folder Path"))
+            if (GUILayout.Button("Create Path"))
             {
-                var editor = Editor.CreateEditor(ScriptableObject.CreateInstance<FolderPath>());
+                var asset = ScriptableObject.CreateInstance<FolderPath>();
+                var editor = Editor.CreateEditor(asset);
                 editors.Add(editor);
+                asset.Label = "LabelPath_" + editors.Count;
+                CreateAsset<FolderPath>((FolderPath)editor.target, SaveAssetPath + "Path_" + Guid.NewGuid() + ".asset");
             }
             GUILayout.EndHorizontal();
             using(GUILayout.ScrollViewScope scrollViewScope = new GUILayout.ScrollViewScope(m_ScrollPosition))
@@ -41,7 +45,7 @@ namespace FolderManager
                         GUILayout.BeginVertical();
                         item.OnInspectorGUI();
                         GUILayout.EndVertical();
-                        SaveAndDeleteButton(item);
+                        DeleteButton(item);
                         GUILayout.EndVertical();
                         DrawUILine(Color.grey);
                     }
@@ -66,14 +70,9 @@ namespace FolderManager
             }
         }
 
-        private void SaveAndDeleteButton(Editor item)
+        private void DeleteButton(Editor item)
         {
             GUILayout.BeginVertical();
-            if (GUILayout.Button("Save"))
-            {
-                var asset = (FolderPath)item.target;
-                CreateAsset<FolderPath>(asset, SaveAssetPath + asset.Label + ".asset");
-            }
             if (GUILayout.Button("Delete"))
             {
                 var asset = (FolderPath)item.target;
