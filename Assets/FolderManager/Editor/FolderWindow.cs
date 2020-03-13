@@ -24,8 +24,9 @@ namespace FolderManager
 
         void OnGUI()
         {
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Create Path"))
+            GUILayout.BeginHorizontal(new GUIStyle() { });
+            GUILayout.FlexibleSpace();
+            if (GUILayout.Button("Create Path", new GUIStyle(GUI.skin.button) { fixedWidth = 280f, fixedHeight = 35, fontSize = 14 }))
             {
                 var asset = ScriptableObject.CreateInstance<FolderPath>();
                 var editor = Editor.CreateEditor(asset);
@@ -33,6 +34,7 @@ namespace FolderManager
                 asset.Label = "LabelPath_" + editors.Count;
                 CreateAsset<FolderPath>((FolderPath)editor.target, SaveAssetPath + "Path_" + Guid.NewGuid() + ".asset");
             }
+            GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
             using(GUILayout.ScrollViewScope scrollViewScope = new GUILayout.ScrollViewScope(m_ScrollPosition))
             {

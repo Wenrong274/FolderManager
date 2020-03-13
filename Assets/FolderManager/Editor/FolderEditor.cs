@@ -1,6 +1,6 @@
 using System;
-using System.IO;
 using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 
 namespace FolderManager
@@ -10,10 +10,15 @@ namespace FolderManager
     {
         FolderPath m_Target;
         string nodeName = string.Empty;
+        bool on = false;
+
+        private void OnEnable()
+        {
+            m_Target = (FolderPath)target;
+        }
 
         public override void OnInspectorGUI()
         {
-            m_Target = (FolderPath)target;
             GUIStyle titleStyle = new GUIStyle(GUI.skin.label) { fixedWidth = 140, alignment = TextAnchor.MiddleLeft };
             GUIStyle btnStyle = new GUIStyle(GUI.skin.button) { fixedWidth = 40, alignment = TextAnchor.MiddleCenter };
             GUIStyle textFieldGUI = new GUIStyle(GUI.skin.textField) { alignment = TextAnchor.LowerLeft };
@@ -21,8 +26,7 @@ namespace FolderManager
             LabelGUI(titleStyle, textFieldGUI);
             RootPathTypeGUI(titleStyle);
             AddNodesGUI(titleStyle, btnStyle);
-            ShowPathGUI(titleStyle);
-            ShowNodesGUI(titleStyle, btnStyle, textFieldGUI);
+            ShowPathGUI(titleStyle, btnStyle, textFieldGUI);
         }
 
         private void LabelGUI(GUIStyle TitleStyle, GUIStyle TextFieldGUI)
@@ -49,6 +53,7 @@ namespace FolderManager
             GUILayout.BeginHorizontal();
             GUILayout.Label("Add Nodes", TitleStyle);
             nodeName = GUILayout.TextField(nodeName, textFieldGUI);
+
             if (GUILayout.Button("+", BtnStyle))
             {
                 if (!string.IsNullOrEmpty(nodeName))
@@ -61,7 +66,7 @@ namespace FolderManager
             GUILayout.EndHorizontal();
         }
 
-        private void ShowPathGUI(GUIStyle TitleStyle)
+        private void ShowPathGUI(GUIStyle TitleStyle, GUIStyle BtnStyle, GUIStyle TextField)
         {
             string[] Paths = new string[m_Target.Node.Count + 1];
             Paths[0] = m_Target.RootPath;
@@ -69,15 +74,27 @@ namespace FolderManager
                 Paths[i] = m_Target.Node[i - 1];
             GUILayout.BeginHorizontal();
 
-            string path = Path.Combine(Paths).Replace('\\', '/');
+            string path = System.IO.Path.Combine(Paths).Replace('\\', '/');
             GUILayout.Label("Path Structure", TitleStyle);
-            GUILayout.Label(path);
+            ShowNodesGUI(path, TitleStyle, BtnStyle, TextField);
+
             GUILayout.EndHorizontal();
         }
 
-        private void ShowNodesGUI(GUIStyle TitleStyle, GUIStyle BtnStyle, GUIStyle TextFieldGUI)
+        private void ShowNodesGUI(string path, GUIStyle TitleStyle, GUIStyle BtnStyle, GUIStyle TextField)
         {
             TitleStyle.alignment = TextAnchor.MiddleRight;
+            EditorGUILayout.BeginVertical(GUI.skin.box);
+            EditorGUI.indentLevel++;
+            on = EditorGUILayout.Foldout(on, path);
+            if (on)
+                ShowNode(TitleStyle, BtnStyle, TextField);
+            EditorGUI.indentLevel--;
+            EditorGUILayout.EndVertical();
+        }
+
+        private void ShowNode(GUIStyle TitleStyle, GUIStyle BtnStyle, GUIStyle TextFieldGUI)
+        {
             for (int i = 0; i < m_Target.Node.Count; i++)
             {
                 string hyphen = (i < m_Target.Node.Count - 1) ? "┝ " : "└ ";
@@ -85,9 +102,7 @@ namespace FolderManager
                 GUILayout.Label(hyphen, TitleStyle);
                 m_Target.Node[i] = GUILayout.TextField(m_Target.Node[i], TextFieldGUI);
                 if (GUILayout.Button("-", BtnStyle))
-                {
                     m_Target.Node.RemoveAt(i);
-                }
                 GUILayout.EndHorizontal();
             }
         }
