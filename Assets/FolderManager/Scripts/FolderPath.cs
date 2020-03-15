@@ -7,12 +7,16 @@ namespace FolderManager
     {
         public string Label = "LabelPath";
         public RootPathType RootPathType;
-        public string RootPath;
         public List<string> Node = new List<string>();
-
-        private void Awake()
+        private string m_RootPath;
+        public string RootPath
         {
-            RootPath = FolderManager.RootPath.GetFolderPath(RootPathType);
+            get
+            {
+                if (string.IsNullOrEmpty(m_RootPath))
+                    m_RootPath = FolderManager.RootPath.GetFolderPath(RootPathType);
+                return m_RootPath;
+            }
         }
     }
 }

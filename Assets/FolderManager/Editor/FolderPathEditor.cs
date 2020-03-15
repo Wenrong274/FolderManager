@@ -6,7 +6,7 @@ using UnityEngine;
 namespace FolderManager
 {
     [CustomEditor(typeof(FolderPath))]
-    public class FolderEditor : Editor
+    public class FolderPathEditor : Editor
     {
         FolderPath m_Target;
         string nodeName = string.Empty;

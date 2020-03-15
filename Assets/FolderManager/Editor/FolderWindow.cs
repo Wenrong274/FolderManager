@@ -9,15 +9,17 @@ namespace FolderManager
 {
     public class FolderWindow : EditorWindow
     {
-        private List<Editor> editors;
-        private string SaveAssetPath = "FolderManager/StreamingAssets/";
+        Editor EditorFolder;
+        Folders folder;
+        List<Editor> EditorFolderPath = new List<Editor>();
+
+        private string SaveAssetPath = "Assets/FolderManager/StreamingAssets/FolderManager.asset";
         Vector2 m_ScrollPosition = Vector2.zero;
 
         [MenuItem("Folder Manage/Edit Path")]
         static void Init()
         {
             FolderWindow window = (FolderWindow)EditorWindow.GetWindow(typeof(FolderWindow));
-            window.editors = new List<Editor>();
             window.InitAssetEdit();
             window.Show();
         }
@@ -29,10 +31,10 @@ namespace FolderManager
             if (GUILayout.Button("Create Path", new GUIStyle(GUI.skin.button) { fixedWidth = 280f, fixedHeight = 35, fontSize = 14 }))
             {
                 var asset = ScriptableObject.CreateInstance<FolderPath>();
-                var editor = Editor.CreateEditor(asset);
-                editors.Add(editor);
-                asset.Label = "LabelPath_" + editors.Count;
-                CreateAsset<FolderPath>((FolderPath)editor.target, SaveAssetPath + "Path_" + Guid.NewGuid() + ".asset");
+                folder.Path.Add(asset);
+                EditorFolderPath.Add(Editor.CreateEditor(asset));
+                asset.Label = "LabelPath_" + folder.Path.Count;
+                CreateAsset<Folders>(folder, SaveAssetPath);
             }
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
@@ -41,70 +43,29 @@ namespace FolderManager
                 m_ScrollPosition = scrollViewScope.scrollPosition;
                 using(new GUILayout.VerticalScope(new GUIStyle(GUI.skin.label) { alignment = TextAnchor.LowerCenter }))
                 {
-                    foreach (var item in editors.ToList())
-                    {
-                        GUILayout.BeginHorizontal();
-                        GUILayout.BeginVertical();
-                        item.OnInspectorGUI();
-                        GUILayout.EndVertical();
-                        DeleteButton(item);
-                        GUILayout.EndVertical();
-                        DrawUILine(Color.grey);
-                    }
+                    EditorFolder.OnInspectorGUI();
                 }
             }
         }
 
         private void InitAssetEdit()
         {
-            string assetPath = GetAssetPathAndName(SaveAssetPath);
-            string[] fileName = Directory.GetFiles(Application.dataPath + "/" + SaveAssetPath, "*.asset", SearchOption.AllDirectories);
-
-            foreach (var item in fileName)
+            folder = LoadAsset<Folders>(SaveAssetPath);
+            if (folder == null)
+                folder = new Folders();
+            Debug.Log(("Asset/" + SaveAssetPath) + "  " + (folder == null));
+            EditorFolder = Editor.CreateEditor(folder);
+            foreach (var item in folder.Path)
             {
-                string path = item.Replace(Application.dataPath, "Assets");
-                var asset = LoadAsset<FolderPath>(path);
-                if (asset != null)
-                {
-                    var editor = Editor.CreateEditor(asset);
-                    editors.Add(editor);
-                }
+                var ed = Editor.CreateEditor(item);
+                EditorFolderPath.Add(ed);
             }
-        }
-
-        private void DeleteButton(Editor item)
-        {
-            GUILayout.BeginVertical();
-            if (GUILayout.Button("Delete"))
-            {
-                var asset = (FolderPath)item.target;
-                DeleteAsset(asset);
-                editors.Remove(item);
-            }
-            GUILayout.EndVertical();
-        }
-
-        private void DeleteAsset(FolderPath asset)
-        {
-            string label = asset.Label;
-            string assetPathAndName = AssetDatabase.GetAssetPath(asset);
-            AssetDatabase.DeleteAsset(assetPathAndName);
-        }
-
-        public static void DrawUILine(Color color, int thickness = 2, int padding = 10)
-        {
-            Rect r = EditorGUILayout.GetControlRect(GUILayout.Height(padding + thickness));
-            r.height = thickness;
-            r.y += padding / 2;
-            r.x -= 2;
-            r.width += 6;
-            EditorGUI.DrawRect(r, color);
         }
 
         private void CreateAsset<T>(T asset, string Savepath)where T : ScriptableObject
         {
             string assetPathAndName = string.Empty;
-            T LoaderAsset = LoadAsset<T>(GetAssetPathAndName(Savepath));
+            T LoaderAsset = LoadAsset<T>(Savepath);
             if (LoaderAsset != null)
             {
                 LoaderAsset = asset;
@@ -123,20 +84,12 @@ namespace FolderManager
 
         private T LoadAsset<T>(string assetPathAndName)where T : ScriptableObject
         {
-            T result = (T)AssetDatabase.LoadAssetAtPath(assetPathAndName, typeof(T));
-            return result;
-        }
-
-        private string GetAssetPathAndName(string Savepath)
-        {
-            string result = Path.Combine("Assets/", Savepath);
-            return result;
+            return (T)AssetDatabase.LoadAssetAtPath(assetPathAndName, typeof(T));
         }
 
         private string GenerateUniqueAssetPath(string Savepath)
         {
-            string result = GetAssetPathAndName(Savepath);
-            return AssetDatabase.GenerateUniqueAssetPath(result);
+            return AssetDatabase.GenerateUniqueAssetPath(Savepath);
         }
     }
 }

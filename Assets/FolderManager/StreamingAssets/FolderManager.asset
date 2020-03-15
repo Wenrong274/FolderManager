@@ -9,10 +9,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa966cabe2c0c8a45a048fe2bbece422, type: 3}
-  m_Name: Path_3a2e24c7-0c8a-4d51-80cb-2defded4e2de
+  m_Script: {fileID: 11500000, guid: dcd5ef8498a520d41bb8e0bfe78db871, type: 3}
+  m_Name: FolderManager
   m_EditorClassIdentifier: 
-  Label: LabelPath_2
-  RootPathType: 0
-  RootPath: D:/Unity/FolderManager
-  Node: []
+  Path:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
