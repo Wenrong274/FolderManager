@@ -1,6 +1,5 @@
 using System;
 using UnityEditor;
-using UnityEditorInternal;
 using UnityEngine;
 
 namespace FolderManager
@@ -69,15 +68,15 @@ namespace FolderManager
         private void ShowPathGUI(GUIStyle TitleStyle, GUIStyle BtnStyle, GUIStyle TextField)
         {
             string[] Paths = new string[m_Target.Node.Count + 1];
+            string path;
             Paths[0] = m_Target.RootPath;
             for (int i = 1; i < Paths.Length; i++)
                 Paths[i] = m_Target.Node[i - 1];
-            GUILayout.BeginHorizontal();
+            path = System.IO.Path.Combine(Paths).Replace('\\', '/');
 
-            string path = System.IO.Path.Combine(Paths).Replace('\\', '/');
+            GUILayout.BeginHorizontal();
             GUILayout.Label("Path Structure", TitleStyle);
             ShowNodesGUI(path, TitleStyle, BtnStyle, TextField);
-
             GUILayout.EndHorizontal();
         }
 
