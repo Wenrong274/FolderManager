@@ -3,7 +3,8 @@ using UnityEngine;
 
 namespace FolderManager
 {
-    public class FolderPath : ScriptableObject
+    [System.Serializable]
+    public class FolderPath
     {
         public string Label = "LabelPath";
         public RootPathType RootPathType;

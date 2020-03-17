@@ -13,5 +13,15 @@ MonoBehaviour:
   m_Name: FolderManager
   m_EditorClassIdentifier: 
   Path:
-  - {fileID: 0}
-  - {fileID: 0}
+  - Label: LabelPath_1
+    RootPathType: 0
+    Node: []
+  - Label: LabelPath_2
+    RootPathType: 0
+    Node: []
+  - Label: LabelPath_3
+    RootPathType: 0
+    Node: []
+  - Label: LabelPath_4
+    RootPathType: 0
+    Node: []

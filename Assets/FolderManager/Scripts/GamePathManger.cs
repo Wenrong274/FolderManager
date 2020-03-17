@@ -15,23 +15,15 @@ public class GamePathManger : MonoBehaviour
             if (instance == null)
             {
                 GameObject go = new GameObject("GamePathManger");
-
                 instance = go.AddComponent<GamePathManger>();
-                instance.initial();
             }
             return instance;
         }
     }
+
     public Folders Folders;
 
-    private void initial()
-    {
-        //Application.streamingAssetsPath + "FolderManager.asset";
-
-    }
-
     IEnumerator Start()
-
     {
         UnityWebRequest webRequest = UnityWebRequestAssetBundle.GetAssetBundle(Application.streamingAssetsPath + "FolderManager.asset");
         yield return webRequest.SendWebRequest();
