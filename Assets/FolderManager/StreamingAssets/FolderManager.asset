@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcd5ef8498a520d41bb8e0bfe78db871, type: 3}
   m_Name: FolderManager
   m_EditorClassIdentifier: 
-  Path:
+  Paths:
   - Label: LabelPath_1
     RootPathType: 0
     Node: []
@@ -20,11 +20,5 @@ MonoBehaviour:
     RootPathType: 0
     Node: []
   - Label: LabelPath_3
-    RootPathType: 0
-    Node: []
-  - Label: LabelPath_4
-    RootPathType: 0
-    Node: []
-  - Label: LabelPath_5
     RootPathType: 0
     Node: []

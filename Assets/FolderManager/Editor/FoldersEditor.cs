@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -29,7 +28,7 @@ namespace FolderManager
         {
             showNodeOnList = new List<bool>();
             nodeNameList = new List<string>();
-            foreach (var item in m_Target.Path)
+            foreach (var item in m_Target.GetPaths())
             {
                 showNodeOnList.Add(false);
                 nodeNameList.Add(string.Empty);
@@ -43,7 +42,8 @@ namespace FolderManager
                 m_ScrollPosition = scrollViewScope.scrollPosition;
                 using(new GUILayout.VerticalScope(new GUIStyle(GUI.skin.label) { alignment = TextAnchor.LowerCenter }))
                 {
-                    foreach (var item in m_Target.Path.ToList())
+                    FolderPath[] paths = m_Target.GetPaths();
+                    foreach (var item in paths)
                     {
                         GUILayout.BeginHorizontal();
                         GUILayout.BeginVertical();
@@ -53,7 +53,7 @@ namespace FolderManager
                         DeleteCell(item);
                         GUILayout.EndVertical();
                         DrawUILine(Color.grey);
-                        count = count < m_Target.Path.Count - 1 ? count + 1 : 0;
+                        count = count < paths.Length - 1 ? count + 1 : 0;
                     }
                 }
             }
@@ -153,8 +153,8 @@ namespace FolderManager
         public void AddCell()
         {
             var asset = new FolderPath();
-            m_Target.Path.Add(asset);
-            asset.Label = "LabelPath_" + m_Target.Path.Count;
+            m_Target.Add(asset);
+            asset.Label = "LabelPath_" + m_Target.GetPaths().Length;
             CellSetting();
             CreateAsset<Folders>(m_Target, SaveAssetPath);
         }
@@ -164,7 +164,7 @@ namespace FolderManager
             GUILayout.BeginVertical();
             if (GUILayout.Button("Delete"))
             {
-                m_Target.Path.Remove(item);
+                m_Target.Remove(item);
                 CellSetting();
                 CreateAsset<Folders>(m_Target, SaveAssetPath);
             }
