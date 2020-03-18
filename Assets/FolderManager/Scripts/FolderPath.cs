@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace FolderManager
 {
@@ -10,6 +9,7 @@ namespace FolderManager
         public RootPathType RootPathType;
         public List<string> Node = new List<string>();
         private string m_RootPath;
+
         public string RootPath
         {
             get

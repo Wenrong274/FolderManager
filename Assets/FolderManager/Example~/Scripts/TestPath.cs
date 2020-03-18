@@ -6,11 +6,11 @@ using UnityEngine;
 public class TestPath : MonoBehaviour
 {
     [SerializeField] private FolderManager.Folders Folders;
-    public List<FolderPath> Path = new List<FolderPath>();
 
     private void Start()
     {
-        foreach (var item in Folders.Path)
+        var f = Folders;
+        foreach (var item in f.Path)
         {
             Debug.Log(item.Label);
         }
