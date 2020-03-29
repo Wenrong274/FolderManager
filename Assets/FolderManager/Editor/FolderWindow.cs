@@ -11,27 +11,32 @@ namespace FolderManager
         static void Init()
         {
             FolderWindow window = (FolderWindow)EditorWindow.GetWindow(typeof(FolderWindow));
-            window.InitAssetEdit();
             window.Show();
         }
 
         private void InitAssetEdit()
         {
-            FoldersEditor = new FoldersEditor();
+            if (FoldersEditor == null)
+                FoldersEditor = new FoldersEditor();
         }
 
         void OnGUI()
         {
-            GUILayout.BeginHorizontal(new GUIStyle() { });
-            GUILayout.FlexibleSpace();
-            if (GUILayout.Button("Create Path", new GUIStyle(GUI.skin.button) { fixedWidth = 280f, fixedHeight = 35, fontSize = 14 }))
-            {
-                FoldersEditor.AddCell();
-            }
-            GUILayout.FlexibleSpace();
-            GUILayout.EndHorizontal();
+            InitAssetEdit();
+            CreatePath();
             DrawUILine(Color.grey);
             FoldersEditor.OnInspectorGUI();
+        }
+
+        private void CreatePath()
+        {
+            GUIStyle style = new GUIStyle(GUI.skin.button) { fixedWidth = 280f, fixedHeight = 35, fontSize = 14 };
+            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+            if (GUILayout.Button("Create Path", style))
+                FoldersEditor.AddCell();
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
         }
 
         private static void DrawUILine(Color color, int thickness = 2, int padding = 10)

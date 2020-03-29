@@ -22,3 +22,9 @@ MonoBehaviour:
   - Label: LabelPath_3
     RootPathType: 0
     Node: []
+  - Label: LabelPath_4
+    RootPathType: 0
+    Node: []
+  - Label: LabelPath_5
+    RootPathType: 0
+    Node: []
